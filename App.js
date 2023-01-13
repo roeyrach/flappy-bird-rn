@@ -1,3 +1,4 @@
+import { setStatusBarNetworkActivityIndicatorVisible } from "expo-status-bar"
 import { useEffect, useState } from "react"
 import {
 	TouchableWithoutFeedback,
@@ -20,6 +21,7 @@ export default function App() {
 	)
 	const [obstaclesNegHeight, setObstaclesNegHeight] = useState(0)
 	const [obstaclesNegHeightTwo, setObstaclesNegHeightTwo] = useState(0)
+	const [score, setScore] = useState(0)
 	const obstacleWidth = 60
 	const obstacleHeight = 300
 	const gap = 200
@@ -61,6 +63,7 @@ export default function App() {
 		} else {
 			setObstaclesLeft(screenWidth)
 			setObstaclesNegHeight(-Math.random() * 100)
+			setScore((score) => score + 1)
 		}
 	}, [obstaclesLeft])
 
@@ -76,6 +79,7 @@ export default function App() {
 		} else {
 			setObstaclesLeftTwo(screenWidth)
 			setObstaclesNegHeightTwo(-Math.random() * 100)
+			setScore((score) => score + 1)
 		}
 	}, [obstaclesLeftTwo])
 
@@ -107,6 +111,7 @@ export default function App() {
 	return (
 		<TouchableWithoutFeedback onPress={jump}>
 			<View style={styles.container}>
+				{isGameOver && <Text>{score}</Text>}
 				<Bird birdBottom={birdBottom} birdLeft={birdLeft} />
 				<Obstacles
 					color={"green"}
