@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react"
-import { Dimensions, StyleSheet, Text, View } from "react-native"
+import {
+	TouchableWithoutFeedback,
+	Dimensions,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native"
 import Bird from "./components/Bird"
 import Obstacles from "./components/Obstacles"
 
@@ -8,13 +14,20 @@ export default function App() {
 	const screenHeight = Dimensions.get("screen").height
 	const birdLeft = screenWidth / 2
 	const [birdBottom, setBirdBottom] = useState(screenHeight / 2)
-	const [obstacleLeft, setObstacleLeft] = useState(screenWidth)
+	const [obstaclesLeft, setObstaclesLeft] = useState(screenWidth)
+	const [obstaclesLeftTwo, setObstaclesLeftTwo] = useState(
+		screenWidth + screenWidth / 2 + 30
+	)
+	const [obstaclesNegHeight, setObstaclesNegHeight] = useState(0)
+	const [obstaclesNegHeightTwo, setObstaclesNegHeightTwo] = useState(0)
 	const obstacleWidth = 60
 	const obstacleHeight = 300
-	const gap = 50
+	const gap = 200
 	const gravity = 3
 	let gameTimerId
 	let obstaclesLeftTimerId
+	let obstaclesLeftTimerIdTwo
+	const [isGameOver, setIsGameOver] = useState(false)
 
 	//start bird falling
 	useEffect(() => {
@@ -28,31 +41,91 @@ export default function App() {
 			}
 		}
 	}, [birdBottom])
-	console.log(birdBottom)
+
+	const jump = () => {
+		if (!isGameOver && birdBottom < screenHeight) {
+			setBirdBottom((birdBottom) => birdBottom + 50)
+			console.log("jumped")
+		}
+	}
 
 	//start first obstacles
 	useEffect(() => {
-		if (obstacleLeft > 0) {
+		if (obstaclesLeft > -obstacleWidth) {
 			obstaclesLeftTimerId = setInterval(() => {
-				setObstacleLeft((obstacleft) => obstacleLeft - 5)
+				setObstaclesLeft((obstacleft) => obstaclesLeft - 5)
 			}, 30)
+			return () => {
+				clearInterval(obstaclesLeftTimerId)
+			}
+		} else {
+			setObstaclesLeft(screenWidth)
+			setObstaclesNegHeight(-Math.random() * 100)
 		}
+	}, [obstaclesLeft])
 
-		return () => {
-			clearInterval(obstaclesLeftTimerId)
+	//start first obstacles
+	useEffect(() => {
+		if (obstaclesLeftTwo > -obstacleWidth) {
+			obstaclesLeftTimerIdTwo = setInterval(() => {
+				setObstaclesLeftTwo((obstacleftTwo) => obstaclesLeftTwo - 5)
+			}, 30)
+			return () => {
+				clearInterval(obstaclesLeftTimerIdTwo)
+			}
+		} else {
+			setObstaclesLeftTwo(screenWidth)
+			setObstaclesNegHeightTwo(-Math.random() * 100)
 		}
-	}, [obstacleLeft])
+	}, [obstaclesLeftTwo])
 
+	//check for collisions
+	useEffect(() => {
+		console.log(obstaclesLeft)
+		console.log(screenWidth / 2)
+		console.log(obstaclesLeft > screenWidth / 2)
+		if (
+			((birdBottom < obstaclesNegHeight + obstacleHeight + 30 ||
+				birdBottom > obstaclesNegHeight + obstacleHeight + gap - 30) &&
+				obstaclesLeft > screenWidth / 2 - 30 &&
+				obstaclesLeft < screenWidth / 2 + 30) ||
+			((birdBottom < obstaclesNegHeightTwo + obstacleHeight + 30 ||
+				birdBottom > obstaclesNegHeightTwo + obstacleHeight + gap - 30) &&
+				obstaclesLeftTwo > screenWidth / 2 - 30 &&
+				obstaclesLeftTwo < screenWidth / 2 + 30)
+		) {
+			console.log("game over")
+			gameOver()
+		}
+	})
+	const gameOver = () => {
+		clearInterval(gameTimerId)
+		clearInterval(obstaclesLeftTimerId)
+		clearInterval(obstaclesLeftTimerIdTwo)
+		setIsGameOver(true)
+	}
 	return (
-		<View style={styles.container}>
-			<Bird birdBottom={birdBottom} birdLeft={birdLeft} />
-			<Obstacles
-				obstacleWidth={obstacleWidth}
-				obstacleHeight={obstacleHeight}
-				gap={gap}
-				obstacleLeft={obstacleLeft}
-			/>
-		</View>
+		<TouchableWithoutFeedback onPress={jump}>
+			<View style={styles.container}>
+				<Bird birdBottom={birdBottom} birdLeft={birdLeft} />
+				<Obstacles
+					color={"green"}
+					obstacleWidth={obstacleWidth}
+					obstacleHeight={obstacleHeight}
+					randomBottom={obstaclesNegHeight}
+					gap={gap}
+					obstaclesLeft={obstaclesLeft}
+				/>
+				<Obstacles
+					color={"yellow"}
+					obstacleWidth={obstacleWidth}
+					obstacleHeight={obstacleHeight}
+					randomBottom={obstaclesNegHeightTwo}
+					gap={gap}
+					obstaclesLeft={obstaclesLeftTwo}
+				/>
+			</View>
+		</TouchableWithoutFeedback>
 	)
 }
 

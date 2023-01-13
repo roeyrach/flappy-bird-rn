@@ -7,21 +7,21 @@ function Obstacles(props) {
 			<View
 				style={{
 					position: "absolute",
-					backgroundColor: "green",
+					backgroundColor: props.color,
 					width: props.obstacleWidth,
-					height: props.obstacleHeight,
-					left: props.obstacleLeft,
-					bottom: 0 + props.obstacleHeight + props.gap,
+					height: props.obstacleHeight + 100,
+					left: props.obstaclesLeft,
+					bottom: props.randomBottom + props.obstacleHeight + props.gap,
 				}}
 			></View>
 			<View
 				style={{
 					position: "absolute",
-					backgroundColor: "green",
+					backgroundColor: props.color,
 					width: props.obstacleWidth,
 					height: props.obstacleHeight,
-					left: props.obstacleLeft,
-					bottom: 0,
+					left: props.obstaclesLeft,
+					bottom: props.randomBottom,
 				}}
 			></View>
 		</>
